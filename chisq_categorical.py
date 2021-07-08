@@ -71,8 +71,8 @@ def stim_table_to_categories(stim_table,
     options_per_column = []
     max_combination = 1
     for column in columns:
-        column_params = np.unique(stim_table[column].values)
-        column_params = column_params[np.isfinite(column_params)]
+        column_params = np.unique(np.array(stim_table[column].values))
+        #column_params = column_params[np.isfinite(column_params)]
         unique_params.append(column_params)
         options_per_column.append(len(column_params))
         max_combination*=len(column_params)
@@ -87,16 +87,16 @@ def stim_table_to_categories(stim_table,
         matches_combination = np.ones((num_sweeps,),dtype=np.bool)
         for i_col,column in enumerate(columns):
             param = unique_params[i_col][curr_combination[i_col]]
-            matches_param = stim_table[column].values == param
+            matches_param = np.array(stim_table[column].values) == param
             matches_combination *= matches_param
             
         if np.any(matches_combination):
             sweep_categories[matches_combination] = category
             if verbose:
-                print 'Category ' + str(category)
+                print('Category ' + str(category))
                 for i_col,column in enumerate(columns):
                     param = unique_params[i_col][curr_combination[i_col]]
-                    print column + ': ' + str(param)
+                    print(column + ': ' + str(param))
             
             category+=1
               
@@ -106,7 +106,7 @@ def stim_table_to_categories(stim_table,
     
     if verbose:    
         blank_sweeps = sweep_categories==-1
-        print 'num blank: ' + str(blank_sweeps.sum())
+        print('num blank: ' + str(blank_sweeps.sum()))
         
     return sweep_categories
     
@@ -127,12 +127,11 @@ def advance_combination(curr_combination,
             
     return curr_combination
     
-
 def make_category_dummy(sweep_categories):
     #makes a dummy variable version of the sweep category list
     
     num_sweeps = len(sweep_categories)
-    categories = np.unique(sweep_categories)
+    categories = np.sort(np.unique(sweep_categories))
     num_categories = len(categories)
     
     sweep_category_mat = np.zeros((num_sweeps,num_categories),dtype=np.bool)
